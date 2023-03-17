@@ -1,0 +1,9 @@
+[package]
+name = "tokio-pub-sub"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+anyhow = "1.0.69"
+tokio = { version = "1.26.0", features = ["full"] }
