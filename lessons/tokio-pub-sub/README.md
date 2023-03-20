@@ -9,7 +9,7 @@ enum Message {
 }
 ```
 
-The sedner can either send text messages or tell the subscriber to shutdown.  Before we can send a message, let's spin up the subscribers:
+The publisher can either send text messages or tell the subscriber to shutdown.  Before we can send a message, let's spin up the subscribers:
 
 ```rust
 #[tokio::main]

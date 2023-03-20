@@ -6,9 +6,16 @@ The [Rust Book](https://doc.rust-lang.org/book/) is an incredible resource.  Com
 
 ### Quick Links
 * [Tokio Pub Sub](lessons/tokio-pub-sub/)
+* [Create your own Async Mutex](lessons/create-your-own-mutex/)
 
 ### Tokio Pub Sub
 
 Build a small pubsub system with subscribers running on separate threads.  The publisher can send text messages to all subscribers, as well as signal them to gracefully shutdown. 
 
 [Tokio Pub Sub](lessons/tokio-pub-sub/)
+
+### Create your own Async Mutex
+
+Learn about an Async Mutex by creating your own.  This Mutex is heavily inspired by [Tokio's Mutex](https://docs.rs/tokio/latest/tokio/sync/struct.Mutex.html).
+
+[Create your own Async Mutex](lessons/create-your-own-mutex/)
