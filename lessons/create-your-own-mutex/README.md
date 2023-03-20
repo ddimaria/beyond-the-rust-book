@@ -94,7 +94,7 @@ async fn async_mutex_across_threads() {
     let mut set = JoinSet::new();
     let count = Arc::new(Mutex::new(0));
 
-    // create 10 threads and increment the Mutex's inner value 100 times per
+    // create 10 threads and increment the Mutex's inner value 100 times per thread
     for _ in 0..10 {
         let my_count = Arc::clone(&count);
 
@@ -109,5 +109,5 @@ async fn async_mutex_across_threads() {
     while let Some(_) = set.join_next().await {}
 
     assert_eq!(*count.clone().lock().await, 1000);
-    }
+}
 ```
