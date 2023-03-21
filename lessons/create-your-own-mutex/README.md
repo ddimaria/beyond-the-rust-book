@@ -19,11 +19,12 @@ This Mutex is intended to be wrapped in an Arc when sending across threads:
 let mutex = Arc::new(Mutex::new(0));
 ```
 
-A `MutexGuard` represents exclusive access to the inner value (`T`).  Since this struct is Send, it can be held across await points.
+A `MutexGuard` represents exclusive access to the inner value (`T`).  Since this struct is Send, it can be held across await points.  We're currently not using the `_permit` filed.
 
 ```rust
 pub struct MutexGuard<'a, T> {
     lock: &'a Mutex<T>,
+    _permit: SemaphorePermit<'a>,
 }
 ```
 
@@ -46,8 +47,16 @@ impl<T> Mutex<T> {
     }
 
     pub async fn lock(&self) -> MutexGuard<'_, T> {
-        let _ = self.semaphore.acquire().await;
-        MutexGuard { lock: self }
+        let _permit = self
+            .semaphore
+            .acquire()
+            .await
+            .unwrap_or_else(|_| unreachable!());
+
+        MutexGuard {
+            lock: self,
+            _permit,
+        }
     }
 }
 ```
@@ -56,17 +65,9 @@ The `inner` part of the Mutex is the actual data we're allowing shared mutable a
 
 The `semaphore` is used to protect the `inner` data from shared access to it.  While a Semphore can be used to handle multiple permits, we're only issuing a single permit to represent exclusive access.
 
-The `lock` function allows us to acquire a lock and return an exclusive MutexGuard.  The Semaphore is the superpower in this Mutex as it asynchronously waits if a permit isn't available.  Permits are issued on a first come, first serve basis.  We're ignoring the error state in `acquire()` since we never close the Semaphore.
+The `lock` function allows us to acquire a lock and return an exclusive MutexGuard.  The Semaphore is the superpower in this Mutex as it asynchronously waits if a permit isn't available.  Permits are issued on a first come, first serve basis.  We should always be able to acquire a permit since we never close the Semaphore.
 
-We now need to implement `Drop` for `MutexGuard` so that we can issue/release the single Semaphore permit when dropping (e.g going out of scope):
-
-```rust
-impl<T> Drop for MutexGuard<'_, T> {
-    fn drop(&mut self) {
-        self.lock.semaphore.add_permits(1);
-    }
-}
-```
+You may have noticed that we're holding onto `_permit`.  This is because we'll drop that permit early if not.  However, when a `MutexGuard` is dropped, the permit is released.
 
 With core functions defined, we can now implement `Deref` and `DerefMut` for exposing read and write access to the inner data.
 

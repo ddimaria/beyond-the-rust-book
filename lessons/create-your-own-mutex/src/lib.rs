@@ -1,6 +1,6 @@
 use std::cell::UnsafeCell;
 use std::ops::{Deref, DerefMut};
-use tokio::sync::Semaphore;
+use tokio::sync::{Semaphore, SemaphorePermit};
 
 /// Async Mutex modeled from Tokio's Mutex.  This is a non-blocking lock that
 /// can be held across await points.  Async Mutex's are great for sharing IO
@@ -18,9 +18,10 @@ pub struct Mutex<T> {
 /// this struct is Send, it can be held across await points.
 pub struct MutexGuard<'a, T> {
     lock: &'a Mutex<T>,
+    _permit: SemaphorePermit<'a>,
 }
 
-/// Send and Sync are marker traits, which simply means they are traits with
+/// Send and Sync are marker traits, which simply means they are traits with    
 /// empty bodies.  The Mutex and MutexGuard are both safe to send between
 /// threads and share between threads.  The Sync trait needs to be implemented
 /// since UnsafeCell isn't Sync.  Sync is necessary to protect direct access
@@ -44,15 +45,16 @@ impl<T> Mutex<T> {
     /// basis.  We're ignoring the error state in `acquire()` since we never
     /// close the Semaphore.
     pub async fn lock(&self) -> MutexGuard<'_, T> {
-        let _ = self.semaphore.acquire().await;
-        MutexGuard { lock: self }
-    }
-}
+        let _permit = self
+            .semaphore
+            .acquire()
+            .await
+            .unwrap_or_else(|_| unreachable!());
 
-/// Release a single Semaphore permit when dropping (e.g going out of scope).
-impl<T> Drop for MutexGuard<'_, T> {
-    fn drop(&mut self) {
-        self.lock.semaphore.add_permits(1);
+        MutexGuard {
+            lock: self,
+            _permit,
+        }
     }
 }
 
