@@ -19,7 +19,7 @@ This Mutex is intended to be wrapped in an Arc when sending across threads:
 let mutex = Arc::new(Mutex::new(0));
 ```
 
-A `MutexGuard` represents exclusive access to the inner value (`T`).  Since this struct is Send, it can be held across await points.  We're currently not using the `_permit` filed.
+A `MutexGuard` represents exclusive access to the inner value (`T`).  Since this struct is Send, it can be held across await points.  We're currently not using the `_permit` field.
 
 ```rust
 pub struct MutexGuard<'a, T> {

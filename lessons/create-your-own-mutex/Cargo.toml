@@ -14,3 +14,6 @@ parking_lot = "0.12.1"
 [[bench]]
 name = "bench"
 harness = false
+
+[profile.bench]
+debug = true

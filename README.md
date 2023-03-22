@@ -7,6 +7,7 @@ The [Rust Book](https://doc.rust-lang.org/book/) is an incredible resource.  Com
 ### Quick Links
 * [Tokio Pub Sub](lessons/tokio-pub-sub/)
 * [Create your own Async Mutex](lessons/create-your-own-mutex/)
+* [Benchmark with Criterion and Cargo Flamegraph](lessons/benchmark-with-criterion-and-cargo-flamegraph/)
 
 ### Tokio Pub Sub
 
@@ -19,6 +20,12 @@ Build a small pubsub system with subscribers running on separate threads.  The p
 Learn about an Async Mutex by creating your own.  This Mutex is heavily inspired by [Tokio's Mutex](https://docs.rs/tokio/latest/tokio/sync/struct.Mutex.html).
 
 [Create your own Async Mutex](lessons/create-your-own-mutex/)
+
+### Benchmark with Criterion and Cargo Flamegraph
+
+Create a benchmark for the [Async Mutex](lessons/create-your-own-mutex/) we created and compare against Tokio's Mutex, Rust's std Mutex, and Parking Lot's Mutex and analyze the results.  Generate a flamegraph of the benchmarks.
+
+[Benchmark with Criterion and Cargo Flamegraph](lessons/benchmark-with-criterion-and-cargo-flamegraph/)
 
 ## Lessons to Write
 * Benchmarking with Criterion
